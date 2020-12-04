@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "unexpectedly test"
+    "test": "unexpectedly test",
+    "lint": "eslint *.js",
+    "grammar": "for f in *.pegjs; do pegjs -o ${f%.*}.peg.js $f; done"
   },
   "keywords": [],
   "author": "Joe Hildebrand <joe-github@cursive.net>",
