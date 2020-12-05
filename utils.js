@@ -30,16 +30,19 @@ class Utils {
     const txt = fs.readFileSync(filename, 'utf8')
     return parser(txt)
   }
-  
+
   static adjacentFile(ext) {
-    // this would be idiomatic in tcl.
+    // callsites()[2] would be idiomatic in tcl.
     // unfortunately, vm2 interposes a callsite, so.... let's cheat.
-    const site = this
-      .callsites()
-      .find(s => path.parse(s.getFileName()).name.match(/day\d+/))
-    const p = path.parse(site.getFileName())
-    return path.join(p.dir, p.name + ext)
+    for (const s of this.callsites()) {
+      const p = path.parse(s.getFileName())
+      if (p.name.match(/day\d+/)) {
+        return path.join(p.dir, p.name + ext)
+      }
+    }
+    throw new Error('Day callsite not found')
   }
+
   static callsites() {
     const old = Error.prepareStackTrace
     Error.prepareStackTrace = getStack
