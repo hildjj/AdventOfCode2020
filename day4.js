@@ -1,41 +1,42 @@
 'use strict'
 
-const fs = require('fs')
-const {parse} = require('./day4.peg')
+const Utils = require('./utils')
+
+const lenRegexes = {}
+function digits(str, len) {
+  let r = lenRegexes[len]
+  if (!r) {
+    r = new RegExp(`^\\d{${len}}$`)
+    lenRegexes[len] = r
+  }
+  return !!str.match(r)
+}
+
+function between(str, min, max) {
+  const v = parseInt(str, 10)
+  return (min <= v) && (v <= max)
+}
 
 const rules = {
   byr(f) {
-    if (!f.match(/^\d{4}$/)) {
-      return false
-    }
-    const v = parseInt(f, 10)
-    return (1920 <= v) && (v <= 2002)
+    return digits(f, 4) && between(f, 1920, 2002)
   },
   iyr(f) {
-    if (!f.match(/^\d{4}$/)) {
-      return false
-    }
-    const v = parseInt(f, 10)
-    return (2010 <= v) && (v <= 2020)
+    return digits(f, 4) && between(f, 2010, 2020)
   },
   eyr(f) {
-    if (!f.match(/^\d{4}$/)) {
-      return false
-    }
-    const v = parseInt(f, 10)
-    return (2020 <= v) && (v <= 2030)
+    return digits(f, 4) && between(f, 2020, 2030)
   },
   hgt(f) {
     const m = f.match(/^(\d+)(cm|in)$/)
     if (!m) {
       return false
     }
-    const v = parseInt(m[1], 10)
     switch (m[2]) {
       case 'in':
-        return (59 <= v) && (v <= 76)
+        return between(m[1], 59, 76)
       case 'cm':
-        return (150 <= v) && (v <= 193)
+        return between(m[1], 150, 193)
     }
   },
   hcl(f) {
@@ -55,14 +56,13 @@ const rules = {
     return false
   },
   pid(f) {
-    return !!f.match(/^\d{9}$/)
+    return digits(f, 9)
   }
 }
 const required = Object.keys(rules)
 
 function main() {
-  const inp = fs.readFileSync('day4.txt', 'utf-8')
-  const res = parse(inp)
+  const res = Utils.parseFile()
   let loose = 0
   let tight = 0
   for (const rec of res) {
