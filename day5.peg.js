@@ -145,7 +145,18 @@ function peg$parse(input, options) {
   var peg$e2 = peg$classExpectation(["L", "R"], false, false);
 
   var peg$f0 = function(lines) { return lines };
-  var peg$f1 = function(fb, lr) { return [fb, lr ] };
+  var peg$f1 = function(fb) {
+    return parseInt(
+      fb.replaceAll('F', '0')
+        .replaceAll('B', '1'),
+      2)
+  };
+  var peg$f2 = function(lr) {
+    return parseInt(
+      lr.replaceAll('L', '0')
+        .replaceAll('R', '1'),
+      2)
+  };
 
   var peg$currPos = 0;
   var peg$savedPos = 0;
@@ -396,49 +407,19 @@ function peg$parse(input, options) {
   }
 
   function peg$parseline() {
-    var s0, s1, s2, s3, s4;
+    var s0, s1, s2;
 
     var rule$expects = function (expected) {
       if (peg$silentFails === 0) peg$expect(expected);
     }
 
     s0 = peg$currPos;
-    s1 = peg$currPos;
-    s2 = [];
-    s3 = peg$parseFB();
-    if (s3 !== peg$FAILED) {
-      while (s3 !== peg$FAILED) {
-        s2.push(s3);
-        s3 = peg$parseFB();
-      }
-    } else {
-      s2 = peg$FAILED;
-    }
-    if (s2 !== peg$FAILED) {
-      s1 = input.substring(s1, peg$currPos);
-    } else {
-      s1 = s2;
-    }
+    s1 = peg$parseFB();
     if (s1 !== peg$FAILED) {
-      s2 = peg$currPos;
-      s3 = [];
-      s4 = peg$parseLR();
-      if (s4 !== peg$FAILED) {
-        while (s4 !== peg$FAILED) {
-          s3.push(s4);
-          s4 = peg$parseLR();
-        }
-      } else {
-        s3 = peg$FAILED;
-      }
-      if (s3 !== peg$FAILED) {
-        s2 = input.substring(s2, peg$currPos);
-      } else {
-        s2 = s3;
-      }
+      s2 = peg$parseLR();
       if (s2 !== peg$FAILED) {
-        peg$savedPos = s0;
-        s0 = peg$f1(s1, s2);
+        s1 = [s1, s2];
+        s0 = s1;
       } else {
         peg$currPos = s0;
         s0 = peg$FAILED;
@@ -452,49 +433,91 @@ function peg$parse(input, options) {
   }
 
   function peg$parseFB() {
-    var s0, s1;
+    var s0, s1, s2, s3;
 
     var rule$expects = function (expected) {
       if (peg$silentFails === 0) peg$expect(expected);
     }
 
     s0 = peg$currPos;
+    s1 = peg$currPos;
+    s2 = [];
     rule$expects(peg$e1);
     if (peg$r0.test(input.charAt(peg$currPos))) {
-      s1 = input.charAt(peg$currPos);
+      s3 = input.charAt(peg$currPos);
       peg$currPos++;
     } else {
-      s1 = peg$FAILED;
+      s3 = peg$FAILED;
+    }
+    if (s3 !== peg$FAILED) {
+      while (s3 !== peg$FAILED) {
+        s2.push(s3);
+        rule$expects(peg$e1);
+        if (peg$r0.test(input.charAt(peg$currPos))) {
+          s3 = input.charAt(peg$currPos);
+          peg$currPos++;
+        } else {
+          s3 = peg$FAILED;
+        }
+      }
+    } else {
+      s2 = peg$FAILED;
+    }
+    if (s2 !== peg$FAILED) {
+      s1 = input.substring(s1, peg$currPos);
+    } else {
+      s1 = s2;
     }
     if (s1 !== peg$FAILED) {
-      s0 = input.substring(s0, peg$currPos);
-    } else {
-      s0 = s1;
+      peg$savedPos = s0;
+      s1 = peg$f1(s1);
     }
+    s0 = s1;
 
     return s0;
   }
 
   function peg$parseLR() {
-    var s0, s1;
+    var s0, s1, s2, s3;
 
     var rule$expects = function (expected) {
       if (peg$silentFails === 0) peg$expect(expected);
     }
 
     s0 = peg$currPos;
+    s1 = peg$currPos;
+    s2 = [];
     rule$expects(peg$e2);
     if (peg$r1.test(input.charAt(peg$currPos))) {
-      s1 = input.charAt(peg$currPos);
+      s3 = input.charAt(peg$currPos);
       peg$currPos++;
     } else {
-      s1 = peg$FAILED;
+      s3 = peg$FAILED;
+    }
+    if (s3 !== peg$FAILED) {
+      while (s3 !== peg$FAILED) {
+        s2.push(s3);
+        rule$expects(peg$e2);
+        if (peg$r1.test(input.charAt(peg$currPos))) {
+          s3 = input.charAt(peg$currPos);
+          peg$currPos++;
+        } else {
+          s3 = peg$FAILED;
+        }
+      }
+    } else {
+      s2 = peg$FAILED;
+    }
+    if (s2 !== peg$FAILED) {
+      s1 = input.substring(s1, peg$currPos);
+    } else {
+      s1 = s2;
     }
     if (s1 !== peg$FAILED) {
-      s0 = input.substring(s0, peg$currPos);
-    } else {
-      s0 = s1;
+      peg$savedPos = s0;
+      s1 = peg$f2(s1);
     }
+    s0 = s1;
 
     return s0;
   }
