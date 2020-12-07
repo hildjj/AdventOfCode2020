@@ -1,12 +1,16 @@
 'use strict'
 
 const Utils = require('./utils')
+
+const TARGET = 'shiny gold'
+
 function main() {
   const inp = Utils.parseFile()
 
   const contained = {}
   const contains = {}
   for (const [outer, inner] of inp) {
+    contains[outer] = inner
     for (const i of inner) {
       const c = contained[i[1]]
       if (!c) {
@@ -15,13 +19,15 @@ function main() {
         c.push(outer)
       }
     }
-    contains[outer] = inner
   }
-  let c = contained['shiny gold']
+
+  let c = [TARGET]
   let count = 0
   const seen = new Set()
-  while (c.length) {
+  do {
     const n = c.shift()
+    // if we've seen this color already (this color can be in more than
+    // one larger bag), don't count it again.
     if (!seen.has(n)) {
       count++
       seen.add(n)
@@ -29,7 +35,8 @@ function main() {
         c = c.concat(contained[n])
       }
     }
-  }
+  } while (c.length)
+
   function addContained(color) {
     let count = 1
     for (const ac of contains[color]??[]) {
@@ -37,8 +44,8 @@ function main() {
     }
     return count
   }
-  const ccount = addContained('shiny gold')
-  return [count, ccount - 1]
+  const ccount = addContained(TARGET)
+  return [count - 1, ccount - 1] // remove the TARGET bag in both cases
 }
 
 module.exports = main

@@ -2,7 +2,7 @@
 
 const Utils = require('./utils')
 function main() {
-  const inp = Utils.readLines()
+  const inp = Utils.parseFile()
   return inp
 }
 
