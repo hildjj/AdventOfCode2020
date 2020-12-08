@@ -12,6 +12,9 @@ function run(prog) {
     }
     seen.add(pos)
     switch (prog[pos][0]) {
+      // TODO: if this VM continues to evolve, move opcode definitions and
+      // VM impl to a separate file.  Change opcodes to ints, and optimize
+      // opcode lookup with an array or something.
       case 'nop':
         pos++
         break
