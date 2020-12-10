@@ -50,6 +50,73 @@ class Utils {
     Error.prepareStackTrace = old
     return stack
   }
+
+  static itSome(it, f) {
+    for (const i of it) {
+      if (!!f(i)) {
+        return true
+      }
+    }
+    return false
+  }
+
+  // BELOW lifted from https://github.com/aureooms/js-itertools,
+  // removed need for weird runtime
+  // ----------
+  static *range(start, stop, step=1) {
+    if (!stop) {
+      [start, stop] = [0, start]
+    }
+    if (step < 0) {
+      while (start > stop) {
+        yield start
+        start += step
+      }
+    } else {
+      while (start < stop) {
+        yield start
+        start += step
+      }
+    }
+  }
+
+  static *pick(source, it) {
+    for (const i of it) {
+      yield source[i]
+    }
+  }
+
+  static *combinations(iterable, r) {
+    const pool = [...iterable]
+    const length = pool.length
+
+    if (r > length) {
+      return
+    }
+
+    const indices = [...this.range(r)]
+    yield [...this.pick(pool, indices)]
+
+    while (true) {
+      let i = r - 1
+      while (true) {
+        if (i < 0) {
+          return
+        }
+    
+        if (indices[i] !== i + length - r) {
+          let pivot = ++indices[i]
+          for (++i; i < r; ++i) {
+            indices[i] = ++pivot
+          }
+          break
+        }
+        i--
+      }
+    
+      yield [...this.pick(pool, indices)]
+    }
+  }
 }
 
 module.exports = Utils
