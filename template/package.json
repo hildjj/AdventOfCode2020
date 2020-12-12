@@ -1,0 +1,17 @@
+{
+  "name": "sao-advent-day",
+  "version": "0.0.0",
+  "description": "Advent of Code daily project generator",
+  "author": "hildjj <joe-github@cursive.net> (github.com/hildjj)",
+  "license": "MIT",
+  "files": [
+    "saofile.js",
+    "template"
+  ],
+  "dependencies": {
+    "superb": "^1.3.0"
+  },
+  "devDependencies": {
+    "sao": "^1.0.0"
+  }
+}
