@@ -6,7 +6,18 @@ function getStack(_, stack) {
   return stack
 }
 
+/**
+ * Utility functions
+ */
 class Utils {
+  /**
+   * Read file, parse lines.
+   *
+   * @static
+   * @param {string?} filename - If null, figures out what day today is and
+   *   finds the .txt file
+   * @returns
+   */
   static readLines(filename) {
     if (!filename) {
       // s/.js$/.txt/ from the calling file.
@@ -21,13 +32,21 @@ class Utils {
     if (!filename) {
       filename = this.adjacentFile('.txt')
     }
+    const txt = fs.readFileSync(filename, 'utf8')
+
     if (!parser) {
       parser = this.adjacentFile('.peg.js')
     }
     if (typeof parser !== 'function') {
-      parser = require(parser).parse
+      try {
+        parser = require(parser).parse
+      } catch {
+        console.error(`No parser: "${parser}", falling back on readLines`)
+        return txt
+          .split('\n')
+          .filter(s => s.length)
+      }
     }
-    const txt = fs.readFileSync(filename, 'utf8')
     return parser(txt)
   }
 
@@ -36,8 +55,9 @@ class Utils {
     // unfortunately, vm2 interposes a callsite, so.... let's cheat.
     for (const s of this.callsites()) {
       const p = path.parse(s.getFileName())
-      if (p.name.match(/day\d+/)) {
-        return path.join(p.dir, p.name + ext)
+      const m = p.name.match(/(day\d+)/)
+      if (m) {
+        return path.join(p.dir, m[1] + ext)
       }
     }
     throw new Error('Day callsite not found')

@@ -4,7 +4,7 @@ const Utils = require('./utils')
 const mathjs = require('mathjs')
 
 function main() {
-  const inp = Utils.readLines('day10.txt').map(x => parseInt(x, 10))
+  const inp = Utils.readLines().map(x => parseInt(x, 10))
   inp.sort((a, b) => a - b)
   const max = inp[inp.length - 1] + 3
   inp.push(max)
