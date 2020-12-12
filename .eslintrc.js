@@ -14,6 +14,7 @@ module.exports = {
     "node": true,
     "es6": true
   },
+  "plugins": ["jest"],
   parserOptions: {
     ecmaVersion: 2020,
   },

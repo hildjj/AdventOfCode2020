@@ -14,8 +14,8 @@ class Utils {
    * Read file, parse lines.
    *
    * @static
-   * @param {string?} filename - If null, figures out what day today is and
-   *   finds the .txt file
+   * @param {string} [filename=null] - If null, figures out what day today is
+   *   and finds the .txt file
    * @returns
    */
   static readLines(filename) {

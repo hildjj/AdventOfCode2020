@@ -8,11 +8,13 @@ function main() {
 
   const part1 = inp.filter(([_, min, max, char, pw]) => {
     const count = [...pw].filter(c => c === char).length
-    return (count >= min) && (count <= max)
+    return (count >= parseInt(min, 10)) && (count <= parseInt(max, 10))
   })
 
   const part2 = inp.filter(([_, min, max, char, pw]) => {
-    return (pw[min - 1] === char) ^ (pw[max - 1] === char)
+    const a = pw[parseInt(min, 10) - 1] === char
+    const b = pw[parseInt(max, 10) - 1] === char
+    return a != b // ^
   })
 
   return [part1.length, part2.length]

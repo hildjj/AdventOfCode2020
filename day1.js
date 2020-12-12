@@ -1,22 +1,33 @@
 'use strict'
-const req = require('esm')(module)
-const {Combination} = req('js-combinatorics')
 const Utils = require('./utils')
 
-const inp = Utils.readLines('day1.txt')
-  .map(x => parseInt(x, 10))
-  .sort()
+function part1(inp) {
+  for (const [x, y] of Utils.combinations(inp, 2)) {
+    if (x + y === 2020) {
+      return x * y
+    }
+  }
 
-for (const [x, y] of Combination.of(inp, 2)) {
-  if (x + y === 2020) {
-    console.log(x * y)
-    break
+}
+
+function part2(inp) {
+  for (const [x, y, z] of Utils.combinations(inp, 3)) {
+    if (x + y + z === 2020) {
+      return x * y * z
+    }
   }
 }
 
-for (const [x, y, z] of Combination.of(inp, 3)) {
-  if (x + y + z === 2020) {
-    console.log(x * y * z)
-    break
-  }
+function main(...args) {
+  const inp = Utils.readLines()
+    .map(x => parseInt(x, 10))
+    .sort()
+
+  return [part1(inp, args), part2(inp, args)]
+}
+
+module.exports = main
+if (require?.main === module) {
+  const res = main(...process.argv.slice(2))
+  console.log(res)
 }

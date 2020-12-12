@@ -127,10 +127,9 @@ function part2(inp) {
   return count
 }
 
-function main(part=1) {
-  part = parseInt(part, 10)
+function main(...args) {
   const inp = Utils.readLines().map(l => l.split(''))
-  return (part === 1) ? part1(inp) : part2(inp)
+  return [part1(inp, args), part2(inp, args)]
 }
 
 module.exports = main

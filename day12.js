@@ -3,6 +3,14 @@
 const Utils = require('./utils')
 const assert = require('assert')
 
+const DIRS = {
+  N: [0, -1],
+  E: [1, 0],
+  S: [0, 1],
+  W: [-1, 0]
+}
+const DIRKEYS = Object.keys(DIRS)
+
 function part1(inp) {
   let cur = 1 // East
   let x = 0
@@ -10,31 +18,21 @@ function part1(inp) {
 
   for (let [dir, dist] of inp) {
     if (dir === 'F') {
-      dir = [
-        'N',
-        'E',
-        'S',
-        'W'
-      ][cur]
+      dir = DIRKEYS[cur]
     }
     switch (dir) {
       case 'N':
-        y -= dist
-        break
       case 'S':
-        y += dist
-        break
       case 'E':
-        x += dist
-        break
       case 'W':
-        x -= dist
+        x += DIRS[dir][0] * dist
+        y += DIRS[dir][1] * dist
         break
       case 'L':
-        cur = (cur - (dist / 90) + 12) % 4
+        cur = (cur - (dist / 90) + 4) % 4
         break
       case 'R':
-        cur = (cur + (dist / 90) + 4) % 4
+        cur = (cur + (dist / 90)) % 4
         break
     }
   }
@@ -55,16 +53,11 @@ function part2(inp) {
         y += wy * dist
         break
       case 'N':
-        wy -= dist
-        break
       case 'S':
-        wy += dist
-        break
       case 'E':
-        wx += dist
-        break
       case 'W':
-        wx -= dist
+        wx += DIRS[dir][0] * dist
+        wy += DIRS[dir][1] * dist
         break
       case 'L':
         switch (dist) {
@@ -101,14 +94,8 @@ function part2(inp) {
   return Math.abs(x) + Math.abs(y)
 }
 
-/**
- * Main entry point
- *
- * @param {string} [part=1]
- * @returns {any}
- */
-function main(part='1') {
-  const p = parseInt(part, 10)
+
+function main(...args) {
   const inp = Utils.readLines().map(s => {
     const m = s.match(/([NSEWLRF])(\d+)/)
     if (!m) {
@@ -116,7 +103,7 @@ function main(part='1') {
     }
     return [m[1], parseInt(m[2], 10)]
   })
-  return (p === 1) ? part1(inp) : part2(inp)
+  return [part1(inp, args), part2(inp, args)]
 }
 
 module.exports = main

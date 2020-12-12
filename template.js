@@ -2,27 +2,21 @@
 
 const Utils = require('./utils')
 
-function part1(inp) {
-
+function part1(inp, args) {
+  return 0
 }
 
-function part2(inp) {
-
+function part2(inp, args) {
+  return 0
 }
 
-function main(part=1) {
+function main(...args) {
   const inp = Utils.parseFile()
-  return (part === 1) ? part1(inp) : part2(inp)
+  return [part1(inp, args), part2(inp, args)]
 }
 
 module.exports = main
-if (require?.main === module) {
-  const res = main(...process.argv.slice(2).map(x => {
-    try {
-      return parseInt(x, 10)
-    } catch {
-      return x
-    }
-  }))
+if (require.main === module) {
+  const res = main(...process.argv.slice(2))
   console.log(res)
 }

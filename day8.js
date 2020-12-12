@@ -31,10 +31,13 @@ function run(prog) {
   }
   return [acc, 'jmp']
 }
-function main() {
-  const inp = Utils.parseFile()
-  const [acc] = run(inp) // first run, with infloop
 
+function part1(inp) {
+  const [acc] = run(inp) // first run, with infloop
+  return acc
+}
+
+function part2(inp) {
   // try changing every wrong op.
   let fixed = null
   for (let i=0; i<inp.length; i++) {
@@ -56,10 +59,16 @@ function main() {
     }
     inp[i][0] = old
   }
-  return [acc, fixed]
+  return fixed[0]
+}
+
+function main(...args) {
+  const inp = Utils.parseFile()
+  return [part1(inp, args), part2(inp, args)]
 }
 
 module.exports = main
-if (require?.main === module) {
-  console.log(...main())
+if (require.main === module) {
+  const res = main(...process.argv.slice(2))
+  console.log(res)
 }
