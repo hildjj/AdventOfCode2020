@@ -61,5 +61,31 @@ test('pick', () => {
 
 test('combinations', () => {
   expect([...Utils.combinations(Utils.range(3), 5)]).toEqual([])
-  expect([...Utils.combinations(Utils.range(3), 2)]).toEqual([[0, 1], [0, 2], [1, 2]])
+  expect([...Utils.combinations([0, 1, 2], 2)]).toEqual([[0, 1], [0, 2], [1, 2]])
+})
+
+test('trunc', () => {
+  expect([...Utils.trunc(Utils.range(3), 0)]).toEqual([0, 1, 2])
+  expect([...Utils.trunc(Utils.range(10), 3)]).toEqual([0, 1, 2, 3, 4, 5, 6])
+  expect([...Utils.trunc(Utils.range(10), -3)]).toEqual([0, 1, 2])
+})
+
+test('take', () => {
+  expect([...Utils.take(Utils.range(3), 0)]).toEqual([])
+  expect([...Utils.take(Utils.range(10), 3)]).toEqual([0, 1, 2])
+  expect([...Utils.take(Utils.range(10), -3)]).toEqual([0, 1, 2, 3, 4, 5, 6])
+})
+
+test('permutations', () => {
+  expect([...Utils.permutations('ABCD', 2)].map(a => a.join('')))
+    .toEqual(['AB', 'AC', 'AD', 'BA', 'BC', 'BD', 'CA', 'CB', 'CD', 'DA', 'DB', 'DC'])
+  expect([...Utils.permutations([], 1)]).toEqual([])
+  expect([...Utils.permutations([1, 2, 3], 0)]).toEqual([])
+  expect([...Utils.permutations([1, 2, 3], 5)]).toEqual([])
+  expect([...Utils.permutations([1, 2, 3], -5)]).toEqual([])
+})
+
+test('powerset', () => {
+  expect([...Utils.powerset('ABC')].map(a => a.join('')))
+    .toEqual(['', 'A', 'B', 'C', 'AB', 'AC', 'BC', 'ABC'])
 })

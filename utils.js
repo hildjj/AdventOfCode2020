@@ -200,7 +200,7 @@ class Utils {
    *
    * @static
    * @param {Object|Array<any>|Iterable<any>} source - thing to select from
-   * @param {IterableIterator<number|string>|Iterable<number|string>} it - the indexes or property names
+   * @param {Iterable<number|string>} it - the indexes or property names
    * @yields {any} - the selected property
    */
   static *pick(source, it) {
@@ -218,7 +218,7 @@ class Utils {
    * Combinations of a series, r at a time
    *
    * @static
-   * @param {IterableIterator<any>} iterable - the series to iterate.
+   * @param {Iterable} iterable - the series to iterate.
    * @param {number} r - How many of the series to use in each combination?
    * @yields {Array<any>} - each combination
    */
@@ -254,6 +254,16 @@ class Utils {
     }
   }
 
+  /**
+   * Yields all elements of the iterable except the last <code>n</code> ones.
+   * If <code>n</code> is negative, behaves like
+   * <code>{@link take}(iterable, -n)</code>.
+   *
+   * @static
+   * @param {Iterable} iterable - input
+   * @param {number} n - number of elements to exclude at the end
+   * @yields {any} - the front of the input
+   */
   static *trunc(iterable, n) {
     if (n < 0) {
       yield* this.take(iterable, -n)
@@ -280,6 +290,16 @@ class Utils {
     }
   }
 
+  /**
+   * Yields the first <code>n</code> elements of the input iterable. If
+   * <code>n</code> is negative, behaves like
+   * <code>{@link trunc}(iterable, -n)</code>.
+   *
+   * @static
+   * @param {Iterable} iterable - The input iterable.
+   * @param {Number} n - The number of elements to include in the output.
+   * @yields {any}
+   */
   static *take(iterable, n) {
     if (n == 0) {
       return
@@ -298,11 +318,20 @@ class Utils {
     }
   }
 
+  /**
+   * Yields all permutations of each possible choice of <code>r</code> elements
+   * of the input iterable.
+   *
+   * @static
+   * @param {Iterable} iterable - The input iterable.
+   * @param {Number} r - The size of the permutations to generate.
+   * @yields {Array}
+   */
   static *permutations(iterable, r) {
     const pool = [...iterable]
     const length = pool.length
 
-    if (r > length) {
+    if (r > length || r <= 0 || length === 0) {
       return
     }
 
@@ -310,10 +339,6 @@ class Utils {
     const cycles = [...this.range(length, length - r, -1)]
 
     yield [...this.pick(pool, this.take(indices, r))]
-
-    if (r === 0 || length === 0) {
-      return
-    }
 
     while (true) {
       let i = r
@@ -340,6 +365,14 @@ class Utils {
     }
   }
 
+  /**
+   * Yields all possible subsets of the input, including the input itself
+   * and the empty set.
+   *
+   * @static
+   * @param {Iterable} iterable - input
+   * @yields {Array}
+   */
   static *powerset(iterable) {
     const pool = [...iterable]
     for (const len of this.range(pool.length + 1)) {
