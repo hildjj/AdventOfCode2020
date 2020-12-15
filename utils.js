@@ -47,9 +47,14 @@ class Utils {
     if (!parser) {
       parser = this.adjacentFile('.peg.js')
     }
-    if (typeof parser !== 'function') {
+
+    // @type {function}
+    let parserFunc = null
+    if (typeof parser === 'function') {
+      parserFunc = parser
+    } else {
       try {
-        parser = require(parser).parse
+        parserFunc = require(parser).parse
       } catch {
         console.error(`No parser: "${parser}", falling back on readLines`)
         return txt
@@ -57,7 +62,7 @@ class Utils {
           .filter(s => s.length)
       }
     }
-    return parser(txt)
+    return parserFunc(txt)
   }
 
   static adjacentFile(ext) {
@@ -73,6 +78,51 @@ class Utils {
     const stack = new Error().stack.slice(1) // i am never interesting
     Error.prepareStackTrace = old
     return stack
+  }
+
+  /**
+   * Modulo, minus the JS bug with negative numbers.
+   * `-5 % 4` should be `3`, not `-1`.
+   *
+   * @static
+   * @param {number|BigInt} x
+   * @param {number|BigInt} y
+   * @returns {number|BigInt} x mod y
+   */
+  static mod(x, y) {
+    // == works with either 0 or 0n.
+    if (y == 0) {
+      throw new Error(`Division by zero`)
+    }
+    // @ts-ignore: TS2365.  tsc can't see that x and y are always the same type
+    return ((x % y) + y) % y
+  }
+
+  /**
+   * Integer result of x / y, plus the modulo (unsigned) remainder.
+   *
+   * @static
+   * @param {number|BigInt} x
+   * @param {number|BigInt} y
+   * @returns {[number|BigInt, number|BigInt]} - the quotient and remainder
+   */
+  static divmod(x, y) {
+    // @ts-ignore: TS2362.  x and y are the same time.  We're fine.
+    let q = x / y
+    const r = this.mod(x, y)
+    if (typeof x === 'bigint') {
+      // not only does Math.floor not work for BigInt, it's not needed because
+      // `/` does the right thing in the first place.
+
+      // except for numbers of opposite sign
+      if ((q < 0n) && (r > 0)) {
+        // There was a remainder.  JS rounded toward zero, but python
+        // rounds down.
+        q--
+      }
+      return [ q, r ]
+    }
+    return [ Math.floor(q), r ]
   }
 
   /**
@@ -201,6 +251,99 @@ class Utils {
       }
     
       yield [...this.pick(pool, indices)]
+    }
+  }
+
+  static *trunc(iterable, n) {
+    if (n < 0) {
+      yield* this.take(iterable, -n)
+      return
+    }
+
+    if (n === 0) {
+      yield* iterable
+      return
+    }
+
+    // buffer up n entries, then serve old ones as we go
+    const buffer = new Array(n)
+    let cur = 0
+    let left = n
+    for (const value of iterable) {
+      if (left > 0) {
+        left--
+      } else {
+        yield buffer[cur]
+      }
+      buffer[cur] = value
+      cur = (cur + 1) % n
+    }
+  }
+
+  static *take(iterable, n) {
+    if (n == 0) {
+      return
+    }
+
+    if (n < 0) {
+      yield* this.trunc(iterable, -n)
+      return
+    }
+
+    for (const val of iterable) {
+      yield val
+      if (--n <= 0) {
+        return
+      }
+    }
+  }
+
+  static *permutations(iterable, r) {
+    const pool = [...iterable]
+    const length = pool.length
+
+    if (r > length) {
+      return
+    }
+
+    const indices = [...this.range(length)]
+    const cycles = [...this.range(length, length - r, -1)]
+
+    yield [...this.pick(pool, this.take(indices, r))]
+
+    if (r === 0 || length === 0) {
+      return
+    }
+
+    while (true) {
+      let i = r
+
+      while (i--) {
+        --cycles[i]
+
+        if (cycles[i] === 0) {
+          // Could be costly
+          indices.push(indices.splice(i, 1)[0])
+
+          cycles[i] = length - i
+        } else {
+          const j = cycles[i];
+          [indices[i], indices[length - j]] = [indices[length - j], indices[i]]
+          yield [...this.pick(pool, this.take(indices, r))]
+          break
+        }
+      }
+
+      if (i === -1) {
+        return
+      }
+    }
+  }
+
+  static *powerset(iterable) {
+    const pool = [...iterable]
+    for (const len of this.range(pool.length + 1)) {
+      yield* this.combinations(pool, len)
     }
   }
 }

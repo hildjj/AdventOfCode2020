@@ -11,6 +11,31 @@ test('parseFile', () => {
   expect(t).toEqual(['1', '2'])
 })
 
+test('mod', () => {
+  expect(Utils.mod(4, 4)).toBe(0)
+  expect(Utils.mod(-5, 4)).toBe(3)
+  expect(Utils.mod(4n, 4n)).toBe(0n)
+  expect(Utils.mod(-5n, 4n)).toBe(3n)
+  expect(Utils.mod(-5n, -4n)).toBe(-1n)
+  expect(() => Utils.mod(-5, 4n)).toThrow(/Cannot mix BigInt/)
+  expect(() => Utils.mod(-5n, 4)).toThrow(/Cannot mix BigInt/)
+  expect(() => Utils.mod(4, 0)).toThrow(/Division by zero/)
+  expect(() => Utils.mod(4n, 0n)).toThrow(/Division by zero/)
+  expect(() => Utils.mod(4n, '0')).toThrow(/Division by zero/)
+})
+
+test('divmod', () => {
+  expect(Utils.divmod(4, 4)).toEqual([1, 0])
+  expect(Utils.divmod(-5, 4)).toEqual([-2, 3])
+  expect(Utils.divmod(4n, 4n)).toEqual([1n, 0n])
+  expect(Utils.divmod(-5n, 4n)).toEqual([-2n, 3n])
+  expect(Utils.divmod(-5n, -4n)).toEqual([1n, -1n])
+  expect(() => Utils.divmod(-5, 4n)).toThrow(/Cannot mix BigInt/)
+  expect(() => Utils.divmod(-5n, 4)).toThrow(/Cannot mix BigInt/)
+  expect(() => Utils.divmod(4, 0)).toThrow(/Division by zero/)
+  expect(() => Utils.divmod(4n, 0n)).toThrow(/Division by zero/)
+})
+
 test('itSome', () => {
   expect(Utils.itSome(Utils.range(3), i => i % 2)).toBe(true)
   expect(Utils.itSome([1, 3, 5], i => i % 2 === 0)).toBe(false)
