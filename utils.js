@@ -44,15 +44,15 @@ class Utils {
     }
     const txt = fs.readFileSync(filename, 'utf8')
 
-    if (!parser) {
-      parser = this.adjacentFile('.peg.js')
-    }
-
     // @type {function}
     let parserFunc = null
     if (typeof parser === 'function') {
       parserFunc = parser
     } else {
+      if (!parser) {
+        parser = this.adjacentFile('.peg.js')
+      }
+
       try {
         parserFunc = require(parser).parse
       } catch {

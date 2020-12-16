@@ -1,6 +1,8 @@
 'use strict'
 const Utils = require('../utils')
+const path = require('path')
 
+const INVALID_FILE = `_____DOES___NOT___EXIST:${process.pid}`
 test('readLines', () => {
   const t = Utils.readLines()
   expect(t).toEqual(['1', '2'])
@@ -9,6 +11,16 @@ test('readLines', () => {
 test('parseFile', () => {
   const t = Utils.parseFile()
   expect(t).toEqual(['1', '2'])
+  const {parse} = require('./utils.test.peg')
+  const u = Utils.parseFile(path.join(__dirname, 'utils.test.txt'), parse)
+  expect(u).toEqual(['1', '2'])
+
+  const spy = jest.spyOn(console, 'error').mockImplementation(() => {})
+  const v = Utils.parseFile(null, INVALID_FILE)
+  expect(v).toEqual(['1', '2'])
+  expect(spy).toHaveBeenCalled()
+  expect(spy.mock.calls).toEqual([[`No parser: "${INVALID_FILE}", falling back on readLines`]])
+  spy.mockRestore()
 })
 
 test('mod', () => {
@@ -72,6 +84,8 @@ test('trunc', () => {
 
 test('take', () => {
   expect([...Utils.take(Utils.range(3), 0)]).toEqual([])
+  expect([...Utils.take(Utils.range(3), 3)]).toEqual([0, 1, 2])
+  expect([...Utils.take(Utils.range(3), 4)]).toEqual([0, 1, 2])
   expect([...Utils.take(Utils.range(10), 3)]).toEqual([0, 1, 2])
   expect([...Utils.take(Utils.range(10), -3)]).toEqual([0, 1, 2, 3, 4, 5, 6])
 })
