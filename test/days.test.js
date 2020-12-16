@@ -3,11 +3,10 @@
 const fs = require('fs')
 const path = require('path')
 
-const JEST_DAY = 'JEST_DAY'
 // use JEST_DAY=14 to run day 14 only
+const JEST_DAY = 'JEST_DAY'
 let files
 if (process.env[JEST_DAY]) {
-  console.log('DAY:', process.env[JEST_DAY])
   const day = process.env[JEST_DAY].match(/\d+/g).pop()
   files = [`day${day}.tests`]
 } else {
