@@ -115,7 +115,7 @@ class Utils {
       // `/` does the right thing in the first place.
 
       // except for numbers of opposite sign
-      if ((q < 0n) && (r > 0)) {
+      if ((q < 0n) && (r > 0n)) {
         // There was a remainder.  JS rounded toward zero, but python
         // rounds down.
         q--
