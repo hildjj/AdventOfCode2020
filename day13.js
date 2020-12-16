@@ -2,30 +2,39 @@
 
 const Utils = require('./utils')
 
+// https://en.wikipedia.org/wiki/Extended_Euclidean_algorithm
+// For `BigInt` only
 function gcd(a, b) {
+  // greatest common divisor of two numbers does not change if the larger
+  // number is replaced by its difference with the smaller number
+  // you keep subtracting until the difference is less than the small number,
+  // which is the same as mod.
+
+  // In the extended version, we also keep track of x and y, such that
+  // ax + by = gcd(a, b)
   let [old_r, r] = [a, b]
-  let [old_s, s] = [1n, 0n]
-  let [old_t, t] = [0n, 1n]
-  while (r) {
-    const [quot, rm] = Utils.divmod(old_r, r);
-    [old_r, r] = [r, rm];
-    [old_s, s] = [s, old_s - quot * s];
-    [old_t, t] = [t, old_t - quot * t];
+  let [old_x, x] = [1n, 0n]
+  let [old_y, y] = [0n, 1n]
+  while (r !== 0n) {
+    const [quot, rm] = Utils.divmod(old_r, r)
+    ;[old_r, r] = [r, rm]
+    ;[old_x, x] = [x, old_x - (quot * x)]
+    ;[old_y, y] = [y, old_y - (quot * y)]
   }
-  return [old_r, old_s, old_t]
+  return [old_r, old_x, old_y]
 }
 
 // from https://math.stackexchange.com/a/3864593
 function lcmp(a, ap, b, bp) {
-  const [g, s, t] = gcd(a, b)
-  const pd = ap - bp
-  const [pdm, pdr] = Utils.divmod(pd, g)
+  // the combined period of (A, B) is lcm(a, b)
+  const [g, s] = gcd(a, b)
+  const [pdm, pdr] = Utils.divmod(ap - bp, g)
   if (pdr) {
-    throw new Error(`Never ${a} ${b}`)
+    throw new Error(`${a} and ${b} never sync`)
   }
-  const cp = a / g * b
-  const cph = Utils.mod(ap - s * pdm * a, cp)
-  return [cp, cph]
+  const combined_period = a * b / g  // lcm
+  const combined_phase = Utils.mod(ap - (s * pdm * a), combined_period)
+  return [combined_period, combined_phase]
 }
 
 function part1(inp, args) {
@@ -41,11 +50,13 @@ function part2(inp, args) {
   const busses = inp[1]
     .map((x, i) => [x === 'x' ? x : BigInt(x, 10), BigInt(i)])
     .filter(([x, i]) => x !== 'x')
+  
   let [a, ap] = busses.shift()
   ap = Utils.mod(-ap, a)
-  for (const [b, bp] of busses) {
-    [a, ap] = lcmp(a, ap, b, bp)
-  }
+
+  // GCD of a list is gcd(gcd(1, 2), 3...)
+  ;[a, ap] = busses.reduce(([l, lp], [b, bp]) => lcmp(l, lp, b, bp), [a, ap])
+
   return Utils.mod(-ap, a).toString()
 }
 
