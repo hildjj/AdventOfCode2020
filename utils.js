@@ -365,6 +365,83 @@ class Utils {
     }
   }
 
+  static *ncycle(iterable, n) {
+    const buffer = [];
+
+    for (const item of iterable) {
+      yield item;
+      buffer.push(item);
+    }
+
+    if (buffer.length === 0) {
+      return;
+    }
+
+    while (--n > 0) {
+      yield* buffer;
+    }
+  }
+
+  static *map(callable, iterable) {
+    for (const item of iterable) {
+      yield callable(item);
+    }
+  }
+  static list(iterable) {
+    return Array.from(iterable);
+  }
+  static *_product(pools, i, n) {
+    if (i === n) {
+      yield [];
+      return;
+    }
+
+    const iterable = pools[i];
+
+    for (const buffer of this._product(pools, i + 1, n)) {
+      for (const item of iterable) {
+        buffer.push(item);
+
+        yield buffer;
+
+        buffer.pop(item);
+      }
+    }
+  }
+
+  static product(iterables, repeat = 1) {
+    const pools = [...this.ncycle(iterables.map(i => [...i]).reverse(), repeat)]
+
+    return this.map(this.list, this._product(pools, 0, pools.length))
+  }
+
+  static iter(iterable) {
+    return iterable[Symbol.iterator]();
+  }
+
+  static _reduce(accumulator, iterable, initializer, count = 0) {
+    for (const item of iterable) {
+      initializer = accumulator(initializer, item, count++)
+    }
+
+    return initializer;
+  }
+
+  static reduce(accumulator, iterable, initializer = undefined) {
+    if (initializer === undefined) {
+      const iterator = this.iter(iterable);
+      const first = iterator.next();
+
+      if (first.done) {
+        return undefined;
+      }
+
+      return this._reduce(accumulator, iterator, first.value, 1);
+    }
+
+    return this._reduce(accumulator, iterable, initializer);
+  }
+
   /**
    * Yields all possible subsets of the input, including the input itself
    * and the empty set.
