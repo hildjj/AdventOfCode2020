@@ -103,3 +103,23 @@ test('powerset', () => {
   expect([...Utils.powerset('ABC')].map(a => a.join('')))
     .toEqual(['', 'A', 'B', 'C', 'AB', 'AC', 'BC', 'ABC'])
 })
+
+test('product', () => {
+  expect([...Utils.product(['AB'], 2)].map(a => a.join('')))
+    .toEqual(['AA', 'AB', 'BA', 'BB'])
+  expect([...Utils.product(['AB', 'CD'])].map(a => a.join('')))
+    .toEqual(['AC', 'AD', 'BC', 'BD'])
+})
+
+test('ncycle', () => {
+  expect([...Utils.ncycle('AB', 0)]).toEqual([])
+  expect([...Utils.ncycle('AB', 1)]).toEqual(['A', 'B'])
+  expect([...Utils.ncycle('AB', 2)]).toEqual(['A', 'B', 'A', 'B'])
+  expect([...Utils.ncycle([], 2)]).toEqual([])
+})
+
+test('reduce', () => {
+  expect(Utils.reduce((t, x) => t + x, Utils.range(10))).toBe(45)
+  expect(Utils.reduce((t, x) => t + x, Utils.range(10), 1)).toBe(46)
+  expect(() => Utils.reduce(() => {}, [])).toThrow('Empty iterable and no initializer')
+})

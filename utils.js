@@ -164,6 +164,43 @@ class Utils {
       (g[Symbol.iterator])
   }
 
+  /**
+   * Cross product.  Translated from the python docs.
+   *
+   * @static
+   * @param {Array<Iterable>} iterables - iterables to cross together
+   * @param {number} [repeat=1] - number of times to repeat the iterables
+   * @yields {Array} one of the combinations of the iterables
+   */
+  static *product(iterables, repeat = 1) {
+    const pools = this.ncycle(this.map(this.list, iterables), repeat)
+    let result = [[]]
+    for (const pool of pools) {
+      const r2 = []
+      for (const x of result) {
+        for (const y of pool) {
+          r2.push(x.concat(y))
+        }
+        result = r2
+      }
+    }
+    yield *result
+  }
+
+  /**
+   * Yields all possible subsets of the input, including the input itself
+   * and the empty set.
+   *
+   * @static
+   * @param {Iterable} iterable - input
+   * @yields {Array}
+   */
+  static *powerset(iterable) {
+    const pool = [...iterable]
+    for (const len of this.range(pool.length + 1)) {
+      yield* this.combinations(pool, len)
+    }
+  }
 
   // BELOW lifted from https://github.com/aureooms/js-itertools,
   // removed need for weird runtime
@@ -365,131 +402,115 @@ class Utils {
     }
   }
 
+  /**
+   * Cycle an iteable n times.
+   * @static
+   * @param {Iterable} iterable - The input iterable
+   * @param {Number} n - The number of times to cycle through the input iterable
+   * @yields {Any} - a value from the iterable
+   */
   static *ncycle(iterable, n) {
-    const buffer = [];
+    if (n <= 0) {
+      // nothing
+    } else if (n === 1) {
+      yield *iterable
+    } else {
+      const buffer = []
+      for (const item of iterable) {
+        yield item
+        buffer.push(item)
+      }
 
-    for (const item of iterable) {
-      yield item;
-      buffer.push(item);
-    }
+      if (buffer.length === 0) {
+        return
+      }
 
-    if (buffer.length === 0) {
-      return;
-    }
-
-    while (--n > 0) {
-      yield* buffer;
+      while (--n > 0) {
+        yield* buffer
+      }
     }
   }
 
-  static *map(callable, iterable) {
+  /**
+   * @callback mapCallback
+   * @param {any} item - The item of the iterator to map
+   * @param {number} index - The index of the item in the iterator
+   * @returns {any} - the mapped value
+   */
+
+  /**
+   * Map a function across all of the items in an iterable.
+   *
+   * @static
+   * @param {mapCallback} callable - the mapping function
+   * @param {Iterable} iterable - source to map from
+   * @param {any} [thisArg] - "this" inside of the callable
+   */
+  static *map(callable, iterable, thisArg) {
+    let c = 0
     for (const item of iterable) {
-      yield callable(item);
+      yield callable.call(thisArg, item, c++);
     }
   }
+
+  /**
+   * Convert an iterable into a list.  This is the same as `[...iterable]`
+   * but slightly easier to call as a map function.
+   *
+   * @static
+   * @param {Iterable} iterable - the iterable to convert
+   * @returns {Array}
+   */
   static list(iterable) {
     return Array.from(iterable);
   }
-  static *_product(pools, i, n) {
-    if (i === n) {
-      yield [];
-      return;
-    }
 
-    const iterable = pools[i];
+  /**
+   * @callback reduceCallback
+   * @param {any} accumulator - the value previously returned from the
+   *   callback, starting with the initializer
+   * @param {any} item - the item of the iterator to process
+   * @param {number} index - the index of the item in the iterator
+   * @returns {any} - the next value of the accumulator
+   */
 
-    for (const buffer of this._product(pools, i + 1, n)) {
-      for (const item of iterable) {
-        buffer.push(item);
-
-        yield buffer;
-
-        buffer.pop(item);
-      }
-    }
-  }
-
-  static *reversed(iterable) {
-    const buffer = [];
-
+  /**
+   * @private
+   */
+  static _reduce(callback, iterable, initializer, count = 0) {
     for (const item of iterable) {
-      buffer.push(item);
-    }
-
-    // Caching length is believed to be faster
-
-    let jz = buffer.length;
-
-    for (; jz; --jz) {
-      yield buffer.pop();
-    }
-  }
-  static product_old(iterables, repeat = 1) {
-    const pools = this.list(
-      this.ncycle(
-        this.reversed(
-          this.map(this.list, iterables)
-        ), repeat
-      )
-    )
-
-    return this.map(this.list, this._product(pools, 0, pools.length))
-  }
-  static *product(iterables, repeat = 1) {
-    const pools = this.ncycle(this.map(this.list, iterables), repeat)
-    let result = [[]]
-    for (const pool of pools) {
-      const r2 = []
-      for (const x of result) {
-        for (const y of pool) {
-          r2.push(x.concat(y))
-        }
-        result = r2
-      }
-    }
-    yield *result
-  }
-
-  static iter(iterable) {
-    return iterable[Symbol.iterator]();
-  }
-
-  static _reduce(accumulator, iterable, initializer, count = 0) {
-    for (const item of iterable) {
-      initializer = accumulator(initializer, item, count++)
+      initializer = callback(initializer, item, count++)
     }
 
     return initializer;
   }
 
-  static reduce(accumulator, iterable, initializer = undefined) {
-    if (initializer === undefined) {
-      const iterator = this.iter(iterable);
-      const first = iterator.next();
-
-      if (first.done) {
-        return undefined;
-      }
-
-      return this._reduce(accumulator, iterator, first.value, 1);
-    }
-
-    return this._reduce(accumulator, iterable, initializer);
-  }
-
   /**
-   * Yields all possible subsets of the input, including the input itself
-   * and the empty set.
+   * Repeatedly execute a reducer callback for each item in the iterable,
+   * resulting in a single output value.
    *
    * @static
-   * @param {Iterable} iterable - input
-   * @yields {Array}
+   * @throws {TypeError} - iterable is empty and there is no initializer
+   * @param {reduceCallback} callback - function to call for each item in the iterable
+   * @param {Iterable} iterable - series to pull from
+   * @param {any} [initializer] - initial value.  If none is provided, use the
+   *   first item in the iterable (like `Array.prototype.reduce()`).
+   * @return {any} - the result of the last call to the callback on the last item
    */
-  static *powerset(iterable) {
-    const pool = [...iterable]
-    for (const len of this.range(pool.length + 1)) {
-      yield* this.combinations(pool, len)
+  static reduce(callback, iterable, initializer) {
+    if (initializer === undefined) {
+      // no initializer?  Use the first item in the iterable
+      const iterator = iterable[Symbol.iterator]()
+      const first = iterator.next()
+
+      if (first.done) {
+        throw new TypeError('Empty iterable and no initializer')
+      }
+
+      return this._reduce(callback, iterator, first.value, 1)
     }
+
+    return this._reduce(callback, iterable, initializer)
   }
 }
 

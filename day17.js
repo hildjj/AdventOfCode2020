@@ -6,6 +6,16 @@ const util = require('util')
 
 const {range} = Utils
 
+// just caching these gave me 4s back.
+const UNITS = {}
+function units(dim) {
+  let u = UNITS[dim]
+  if (!u) {
+    u = [...Utils.product([range(-1, 2)], dim)]
+    UNITS[dim] = u
+  }
+  return u
+}
 class Pos {
   constructor(...coords) {
     this.coords = coords
@@ -52,7 +62,7 @@ class Cell {
     this.active = active
   }
   *neighborPos() {
-    for (const coords of Utils.product([range(-1, 2)], this.pos.dim())) {
+    for (const coords of units(this.pos.dim())) {
       const p = this.pos.add(...coords)
       if (!p.is(this.pos)) {
         yield p
