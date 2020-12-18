@@ -409,10 +409,45 @@ class Utils {
     }
   }
 
-  static product(iterables, repeat = 1) {
-    const pools = [...this.ncycle(iterables.map(i => [...i]).reverse(), repeat)]
+  static *reversed(iterable) {
+    const buffer = [];
+
+    for (const item of iterable) {
+      buffer.push(item);
+    }
+
+    // Caching length is believed to be faster
+
+    let jz = buffer.length;
+
+    for (; jz; --jz) {
+      yield buffer.pop();
+    }
+  }
+  static product_old(iterables, repeat = 1) {
+    const pools = this.list(
+      this.ncycle(
+        this.reversed(
+          this.map(this.list, iterables)
+        ), repeat
+      )
+    )
 
     return this.map(this.list, this._product(pools, 0, pools.length))
+  }
+  static *product(iterables, repeat = 1) {
+    const pools = this.ncycle(this.map(this.list, iterables), repeat)
+    let result = [[]]
+    for (const pool of pools) {
+      const r2 = []
+      for (const x of result) {
+        for (const y of pool) {
+          r2.push(x.concat(y))
+        }
+        result = r2
+      }
+    }
+    yield *result
   }
 
   static iter(iterable) {

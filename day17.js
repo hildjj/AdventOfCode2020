@@ -7,61 +7,41 @@ const util = require('util')
 const {range} = Utils
 
 class Pos {
-  constructor(x=0, y=0, z=0) {
-    this.x = x
-    this.y = y
-    this.z = z
+  constructor(...coords) {
+    this.coords = coords
   }
-  add(i, j, k) {
-    return new Pos(this.x + i, this.y + j, this.z + k)
+  get x() {
+    return this.coords[0]
   }
-  is(i, j, k) {
-    if (i instanceof Pos) {
-      [i, j, k] = [i.x, i.y, i.z]
+  get y() {
+    return this.coords[1]
+  }
+  get z() {
+    return this.coords[2]
+  }
+  get w() {
+    return this.coords[3]
+  }
+  dim() {
+    return this.coords.length
+  }
+  isOrigin() {
+    return this.coords.every(c => c === 0)
+  }
+  add(...adds) {
+    return new Pos(...this.coords.map((c, i) => c + adds[i]))
+  }
+  is(...coords) {
+    if (coords[0] instanceof Pos) {
+      coords = coords[0].coords
     }
-    return ((i == null) || (this.x === i)) &&
-      ((j == null) || (this.y === j)) &&
-      ((k == null) || (this.z === k))
+    return coords.reduce((t, c, i) => t && ((c == null) || (this.coords[i] === c)), true)
   }
   toString() {
-    return `${this.x},${this.y},${this.z}`
+    return this.coords.join(',')
   }
   [util.inspect.custom](depth, opts) {
-    return '<' +
-      opts.stylize(this.x, 'number') + ',' +
-      opts.stylize(this.y, 'number') + ',' +
-      opts.stylize(this.z, 'number') + '>'
-  }
-}
-
-class Pos4 {
-  constructor(x=0, y=0, z=0, w=0) {
-    this.x = x
-    this.y = y
-    this.z = z
-    this.w = w
-  }
-  add(i, j, k, l) {
-    return new Pos4(this.x + i, this.y + j, this.z + k, this.w + l)
-  }
-  is(i, j, k, l) {
-    if (i instanceof Pos4) {
-      [i, j, k, l] = [i.x, i.y, i.z, i.w]
-    }
-    return ((i == null) || (this.x === i)) &&
-      ((j == null) || (this.y === j)) &&
-      ((k == null) || (this.z === k)) &&
-      ((l == null) || (this.w === l))
-  }
-  toString() {
-    return `${this.x},${this.y},${this.z}.${this.w}`
-  }
-  [util.inspect.custom](depth, opts) {
-    return '<' +
-      opts.stylize(this.x, 'number') + ',' +
-      opts.stylize(this.y, 'number') + ',' +
-      opts.stylize(this.z, 'number') + ',' +
-      opts.stylize(this.w, 'number') + '>'
+    return '<' + this.coords.map(c => opts.stylize(c, 'number')).join(',') + '>'
   }
 }
 
@@ -72,8 +52,8 @@ class Cell {
     this.active = active
   }
   *neighborPos() {
-    for (const [i, j, k] of Utils.product([range(-1, 2)], 3)) {
-      const p = this.pos.add(i, j, k)
+    for (const coords of Utils.product([range(-1, 2)], this.pos.dim())) {
+      const p = this.pos.add(...coords)
       if (!p.is(this.pos)) {
         yield p
       }
@@ -90,49 +70,30 @@ class Cell {
       this.neighborActives(),
       0)
   }
+  static activeStr(pos, active) {
+    const ch = active ? '#' : '.'
+    if (pos.isOrigin()) {
+      return chalk.bgBlue(ch)
+    }
+    if (pos.is(0,0)) {
+      return chalk.bgRed(ch)
+    }
+    return ch
+  }
   toString() {
-    if (this.pos.is(0,0,0)) {
-      return chalk.bgBlue(this.active ? '#' : '.')
-    }
-    if (this.pos.is(0,0)) {
-      return chalk.bgRed(this.active ? '#' : '.')
-    }
-    return this.active ? '#' : '.'
+    return Cell.activeStr(this.pos, this.active)
   }
   [util.inspect.custom](depth, opts) {
     return `${util.inspect(this.pos, depth-1, opts.colors)}: ${this.toString()}`
   }
 }
 
-class Cell4 extends Cell{
-  constructor(sheet, pos, active=false) {
-    super(sheet, pos, active)
-  }
-  *neighborPos() {
-    for (const [i, j, k, l] of Utils.product([range(-1, 2)], 4)) {
-      const p = this.pos.add(i, j, k, l)
-      if (!p.is(this.pos)) {
-        yield p
-      }
-    }
-  }
-}
-
 class Sheet {
-  constructor(cells={}) {
-    this.cells = cells
-    this.min = {x: Infinity, y: Infinity, z: Infinity}
-    this.max = {x: -Infinity, y: -Infinity, z: -Infinity}
-    this.posType = Pos
-    this.cellType = Cell
-  }
-  setBounds(cell) {
-    if (cell.active) {
-      for (const dir of ['x', 'y', 'z']) {
-        this.min[dir] = Math.min(this.min[dir], cell.pos[dir])
-        this.max[dir] = Math.max(this.max[dir], cell.pos[dir])
-      }
-    }
+  constructor(dim=3) {
+    this.cells = {}
+    this.dim = dim
+    this.min = new Array(dim).fill(Infinity)
+    this.max = new Array(dim).fill(-Infinity)
   }
   add(cell) {
     this.cells[cell.pos] = cell
@@ -141,22 +102,29 @@ class Sheet {
   getCell(pos) {
     let c = this.cells[pos]
     if (!c) {
-      c = this.add(new this.cellType(this, pos))
+      c = this.add(new Cell(this, pos))
     }
     return c
   }
   getCellVal(pos) {
-    return this.getCell(pos).active
+    let c = this.cells[pos]
+    return c ? c.active : false
   }
   setCell(pos, active) {
     let c = this.getCell(pos)
-    if (!c) {
-      c = this.add(new this.cellType(this, pos, active))
+    if (!c && active) {
+      c = this.add(new Cell(this, pos, active))
     } else {
-      c.active = active
-      this.setBounds(c)
+      if (active) {
+        c.active = active
+        for (const dir of range(c.pos.dim())) {
+          this.min[dir] = Math.min(this.min[dir], c.pos.coords[dir])
+          this.max[dir] = Math.max(this.max[dir], c.pos.coords[dir])
+        }
+      } else {
+        delete this.cells[c.pos]
+      }
     }
-    return c
   }
   *allCells() {
     for (const pos of this.scanPos()) {
@@ -166,162 +134,72 @@ class Sheet {
   count() {
     return Utils.reduce((t, c) => c.active ? t + 1 : t, this.allCells(), 0)
   }
-  *scanPos() {
-    // don't try to use product for this, order matters too much
-    for (const k of range(this.min.z-1, this.max.z+2)) {
-      for (const i of range(this.min.x-1, this.max.x+2)) {
-        for (const j of range(this.min.y-1, this.max.y+2)) {
-          yield new this.posType(i, j, k)
-        }
-      }
-    }
+  scanPos() {
+    const ranges = this.min.map((min, i) => range(min-1, this.max[i] + 2)).reverse()
+    return Utils.map((coords) => new Pos(...coords.reverse()), Utils.product(ranges))
   }
   toString() {
     let str = ''
     let oldZ = Infinity
     let oldY = Infinity
+    let oldW = null
     for (const p of this.scanPos()) {
-      if (p.z !== oldZ) {
+      if ((p.z !== oldZ) || (p.w !== oldW)) {
         oldZ = p.z
+        oldW = p.w
         str += `\nz=${p.z}`
+        if (oldW != null) {
+          str += `, w=${p.w}`
+        }
       }
-      if (p.x !== oldY) {
-        oldY = p.x
+      if (p.y !== oldY) {
+        oldY = p.y
         str += '\n'
       }
       const c = this.cells[p]
-      str += c ? c.toString() : '.'
+      str += c ? c.toString() : Cell.activeStr(p, false)
     }
     return str
   }
 }
 
-class Sheet4 extends Sheet {
-  constructor(cells={}) {
-    super(cells)
-    this.min.w = Infinity
-    this.max.w = -Infinity
-  }
-  setBounds(cell) {
-    if (cell.active) {
-      for (const dir of ['x', 'y', 'z', 'w']) {
-        this.min[dir] = Math.min(this.min[dir], cell.pos[dir])
-        this.max[dir] = Math.max(this.max[dir], cell.pos[dir])
+function life(sheet, times=6) {
+  for (const cycle of range(times)) {
+    const newSheet = new Sheet(sheet.dim)
+    for (const c of sheet.allCells()) {
+      const count = c.countNeighbors()
+      if (c.active) {
+        newSheet.setCell(c.pos, (count === 2) || (count === 3))
+      } else {
+        newSheet.setCell(c.pos, count === 3)
       }
     }
+    sheet = newSheet
   }
-  add(cell) {
-    this.cells[cell.pos] = cell
-    return cell
-  }
-  getCell(pos) {
-    let c = this.cells[pos]
-    if (!c) {
-      c = this.add(new Cell4(this, pos))
-    }
-    return c
-  }
-  getCellVal(pos) {
-    return this.getCell(pos).active
-  }
-  setCell(pos, active) {
-    let c = this.getCell(pos)
-    if (!c) {
-      c = this.add(new Cell4(this, pos, active))
-    } else {
-      c.active = active
-      this.setBounds(c)
-    }
-    return c
-  }
-  *allCells() {
-    for (const pos of this.scanPos()) {
-      yield this.getCell(pos)
-    }
-  }
-  count() {
-    return Utils.reduce((t, c) => c.active ? t + 1 : t, this.allCells(), 0)
-  }
-  *scanPos() {
-    // don't try to use product for this, order matters too much
-    for (const k of range(this.min.z-1, this.max.z+2)) {
-      for (const i of range(this.min.x-1, this.max.x+2)) {
-        for (const j of range(this.min.y-1, this.max.y+2)) {
-          for (const l of range(this.min.w-1, this.max.w+2)) {
-            yield new Pos4(i, j, k, l)
-          }
-        }
-      }
-    }
-  }
-  toString() {
-    let str = ''
-    let oldZ = Infinity
-    let oldY = Infinity
-    for (const p of this.scanPos()) {
-      if (p.z !== oldZ) {
-        oldZ = p.z
-        str += `\nz=${p.z}`
-      }
-      if (p.x !== oldY) {
-        oldY = p.x
-        str += '\n'
-      }
-      const c = this.cells[p]
-      str += c ? c.toString() : '.'
-    }
-    return str
-  }
+
+  return sheet.count()
 }
 
 function part1(inp, args) {
-  let sheet = new Sheet()
+  let sheet = new Sheet(3)
 
   for (const i of range(inp.length)) {
     for (const j of range(inp[i].length)) {
-      sheet.setCell(new Pos(i, j), inp[i][j])
+      sheet.setCell(new Pos(i, j, 0), inp[i][j])
     }
   }
-
-  for (const cycle of range(6)) {
-    const newSheet = new Sheet()
-    for (const c of sheet.allCells()) {
-      const count = c.countNeighbors()
-      if (c.active) {
-        newSheet.setCell(c.pos, (count === 2) || (count === 3))
-      } else {
-        newSheet.setCell(c.pos, count === 3)
-      }
-    }
-    sheet = newSheet
-  }
-
-  return sheet.count()
+  return life(sheet)
 }
 
 function part2(inp, args) {
-  let sheet = new Sheet4()
+  let sheet = new Sheet(4)
 
   for (const i of range(inp.length)) {
     for (const j of range(inp[i].length)) {
-      sheet.setCell(new Pos4(i, j), inp[i][j])
+      sheet.setCell(new Pos(i, j, 0, 0), inp[i][j])
     }
   }
-
-  for (const cycle of range(6)) {
-    const newSheet = new Sheet4()
-    for (const c of sheet.allCells()) {
-      const count = c.countNeighbors()
-      if (c.active) {
-        newSheet.setCell(c.pos, (count === 2) || (count === 3))
-      } else {
-        newSheet.setCell(c.pos, count === 3)
-      }
-    }
-    sheet = newSheet
-  }
-
-  return sheet.count()
+  return life(sheet)
 }
 
 function main(...args) {
@@ -330,7 +208,12 @@ function main(...args) {
   return [part1(inp, args), part2(inp, args)]
 }
 
-module.exports = main
+module.exports = {
+  Sheet,
+  Pos,
+  Cell
+}
+//module.exports = main
 if (require.main === module) {
   const res = main(...process.argv.slice(2))
   console.log(res)
