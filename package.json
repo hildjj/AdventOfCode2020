@@ -7,7 +7,7 @@
     "test": "jest",
     "lint": "eslint *.js",
     "day": "sao ./template",
-    "grammar": "for f in *.pegjs; do pegjs -o ${f%.*}.peg.js $f; done"
+    "build": "for f in *.pegjs; do pegjs -o ${f%.*}.peg.js $f; done"
   },
   "keywords": [],
   "author": "Joe Hildebrand <joe-github@cursive.net>",
