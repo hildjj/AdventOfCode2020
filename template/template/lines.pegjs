@@ -1,3 +1,3 @@
-lines = lines:(@line "\n")* { return lines }
+lines = (@line "\n")*
 
 line = $[^\n]*
