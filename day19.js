@@ -2,7 +2,6 @@
 
 const Utils = require('./utils')
 const pegjs = require('pegjs')
-const fs = require('fs')
 
 function numsToList(nums, reverse) {
   if (reverse) {
@@ -12,7 +11,6 @@ function numsToList(nums, reverse) {
 }
 
 function generateGrammar(rules, reverse = false) {
-
   let grammar = ''
   for (const [name, rule] of rules) {
     grammar += `r${name}`
@@ -67,7 +65,6 @@ function part2(inp, args) {
     .filter(r => (r[0] != 8) && (r[0] != 11)) // remove rule 8 and 11
   rules.push([11, ["or", ["and", 42, 31], ["and", 42, 11, 31]]])
   const grammar = generateGrammar(rules, true) + 'r8 = r42+\n'
-  fs.writeFileSync('c.pegjs', grammar, 'utf8')
   const {parse} = pegjs.generate(grammar, {trace: false})
   let count = 0
   for (const i of inp[1]) {
