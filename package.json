@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
+    "coverage": "jest --coverage",
     "lint": "eslint *.js",
     "day": "sao ./template",
     "build": "for f in *.pegjs; do pegjs -o ${f%.*}.peg.js $f; done"
