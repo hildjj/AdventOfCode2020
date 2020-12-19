@@ -31,7 +31,9 @@ module.exports = {
 
   // An array of regexp pattern strings used to skip coverage collection
   coveragePathIgnorePatterns: [
-    'test/*.peg.js'
+    'node_modules',
+    'test/*.peg.js',
+    '/*.peg.js'
   ],
 
   // Indicates which provider should be used to instrument code for coverage
@@ -39,7 +41,7 @@ module.exports = {
 
   // A list of reporter names that Jest uses when writing coverage reports
   coverageReporters: [
-    'html'
+    'lcov'
   ],
   //   "json",
   //   "text",
@@ -81,9 +83,9 @@ module.exports = {
 
   // An array of directory names to be searched recursively up from the
   // requiring module's location
-  // moduleDirectories: [
-  //   "node_modules"
-  // ],
+  moduleDirectories: [
+    "node_modules"
+  ],
 
   // An array of file extensions your modules use
   // moduleFileExtensions: [
