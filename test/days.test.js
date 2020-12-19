@@ -20,7 +20,11 @@ for (const f of files) {
     const j = JSON.parse(data)
     expect(j).toBeTruthy()
     const day = f.match(/\d+/)[0]
-    const mod = require(path.join(__dirname, '..', `day${day}.js`))
+    const modname = path.join(__dirname, '..', `day${day}.js`)
+    const mod = require(modname)
+    if (typeof mod !== 'function') {
+      throw new Error(`Invalid module: "${modname}"`)
+    }
     expect(mod()).toEqual(j)
   })
 }

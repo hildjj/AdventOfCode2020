@@ -12,7 +12,7 @@ test('parseFile', () => {
   const t = Utils.parseFile()
   expect(t).toEqual(['1', '2'])
   const {parse} = require('./utils.test.peg')
-  const u = Utils.parseFile(path.join(__dirname, 'utils.test.txt'), parse)
+  const u = Utils.parseFile(path.join(__dirname, 'inputs', 'utils.test.txt'), parse)
   expect(u).toEqual(['1', '2'])
 
   const spy = jest.spyOn(console, 'error').mockImplementation(() => {})

@@ -21,7 +21,7 @@ class Utils {
   static readLines(filename) {
     if (!filename) {
       // s/.js$/.txt/ from the calling file.
-      filename = this.adjacentFile('.txt')
+      filename = this._adjacentFile('.txt', 'inputs')
     }
     return fs.readFileSync(filename, 'utf8')
       .split('\n')
@@ -40,7 +40,7 @@ class Utils {
    */
   static parseFile(filename, parser) {
     if (!filename) {
-      filename = this.adjacentFile('.txt')
+      filename = this._adjacentFile('.txt', 'inputs')
     }
     const txt = fs.readFileSync(filename, 'utf8')
 
@@ -50,7 +50,7 @@ class Utils {
       parserFunc = parser
     } else {
       if (!parser) {
-        parser = this.adjacentFile('.peg.js')
+        parser = this._adjacentFile('.peg.js')
       }
 
       try {
@@ -65,11 +65,14 @@ class Utils {
     return parserFunc(txt)
   }
 
-  static adjacentFile(ext) {
+  /**
+   * @private
+   */
+  static _adjacentFile(ext, ...dir) {
     // idiomatic tcl
     // @ts-ignore: TS2339, tsc can't see the hidden call of `getStack`
     const p = path.parse(this.callsites()[2].getFileName())
-    return path.join(p.dir, p.name + ext)
+    return path.join(p.dir, ...dir, p.name + ext)
   }
 
   static callsites() {

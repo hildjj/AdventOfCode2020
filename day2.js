@@ -3,7 +3,7 @@
 const Utils = require('./utils')
 
 function main() {
-  const inp = Utils.readLines('./day2.txt')
+  const inp = Utils.readLines()
     .map(s => s.match(/(\d+)-(\d+)\s+(\S):\s+(.*)/))
 
   const part1 = inp.filter(([_, min, max, char, pw]) => {

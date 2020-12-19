@@ -218,12 +218,7 @@ function main(...args) {
   return [part1(inp, args), part2(inp, args)]
 }
 
-module.exports = {
-  Sheet,
-  Pos,
-  Cell
-}
-//module.exports = main
+module.exports = main
 if (require.main === module) {
   const res = main(...process.argv.slice(2))
   console.log(res)

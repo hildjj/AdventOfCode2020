@@ -42,12 +42,12 @@ actions: [
     await spawnAsync('make')
     await spawnAsync('curl',
       '-b', '.cookies',
-      '-o', `day${d}.txt`,
+      '-o', `inputs/day${d}.txt`,
       `https://adventofcode.com/2020/day/${d}/input`)
 
     await spawnAsync('code', `day${d}.js`)
     await spawnAsync('code', `day${d}.pegjs`)
-    await spawnAsync('code', `day${d}.txt`)
+    await spawnAsync('code', `inputs/day${d}.txt`)
     await spawnAsync('code', `test/day${d}.tests`)
     await spawnAsync('npm', 'test')
   }
