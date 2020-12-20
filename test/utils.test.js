@@ -104,6 +104,12 @@ test('powerset', () => {
     .toEqual(['', 'A', 'B', 'C', 'AB', 'AC', 'BC', 'ABC'])
 })
 
+test('forEver', () => {
+  expect([...Utils.take(Utils.forEver('and ever'), 4)]).toEqual([
+    'and ever', 'and ever', 'and ever', 'and ever'
+  ])
+})
+
 test('product', () => {
   expect([...Utils.product(['AB'], 2)].map(a => a.join('')))
     .toEqual(['AA', 'AB', 'BA', 'BB'])

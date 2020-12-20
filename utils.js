@@ -95,7 +95,7 @@ class Utils {
   static mod(x, y) {
     // == works with either 0 or 0n.
     if (y == 0) {
-      throw new Error(`Division by zero`)
+      throw new Error('Division by zero')
     }
     // @ts-ignore: TS2365.  tsc can't see that x and y are always the same type
     return ((x % y) + y) % y
@@ -139,7 +139,8 @@ class Utils {
    * test implemented by the provided function
    *
    * @static
-   * @param {IterableIterator<any>} it - the iterator.  It may not be fully consumed.
+   * @param {IterableIterator<any>} it - the iterator.
+   *   It may not be fully consumed.
    * @param {itSomeCallback} f
    * @param {any} [thisArg] - what is `this` in the function `f`?
    * @returns
@@ -202,6 +203,20 @@ class Utils {
     const pool = [...iterable]
     for (const len of this.range(pool.length + 1)) {
       yield* this.combinations(pool, len)
+    }
+  }
+
+  /**
+   * Yield the same value for ever.  And ever.
+   * Value of VALUES! and Loop of LOOPS!
+   *
+   * @static
+   * @param {any} [val=0] - the value to yield
+   * @yields {any} val
+   */
+  static *forEver(val = 0) {
+    while (true) {
+      yield val
     }
   }
 
@@ -452,7 +467,7 @@ class Utils {
   static *map(callable, iterable, thisArg) {
     let c = 0
     for (const item of iterable) {
-      yield callable.call(thisArg, item, c++);
+      yield callable.call(thisArg, item, c++)
     }
   }
 
@@ -465,7 +480,7 @@ class Utils {
    * @returns {Array}
    */
   static list(iterable) {
-    return Array.from(iterable);
+    return Array.from(iterable)
   }
 
   /**
@@ -485,7 +500,7 @@ class Utils {
       initializer = callback(initializer, item, count++)
     }
 
-    return initializer;
+    return initializer
   }
 
   /**
@@ -494,11 +509,13 @@ class Utils {
    *
    * @static
    * @throws {TypeError} - iterable is empty and there is no initializer
-   * @param {reduceCallback} callback - function to call for each item in the iterable
+   * @param {reduceCallback} callback - function to call for each
+   *   item in the iterable
    * @param {Iterable} iterable - series to pull from
    * @param {any} [initializer] - initial value.  If none is provided, use the
    *   first item in the iterable (like `Array.prototype.reduce()`).
-   * @return {any} - the result of the last call to the callback on the last item
+   * @return {any} - the result of the last call to the callback on the
+   *   last item
    */
   static reduce(callback, iterable, initializer) {
     if (initializer === undefined) {
