@@ -63,7 +63,7 @@ function part2(inp, args) {
   const rules = inp[0]
     .sort((a, b) => a[0] - b[0])
     .filter(r => (r[0] != 8) && (r[0] != 11)) // remove rule 8 and 11
-  rules.push([11, ["or", ["and", 42, 31], ["and", 42, 11, 31]]])
+  rules.push([11, ['or', ['and', 42, 31], ['and', 42, 11, 31]]])
   const grammar = generateGrammar(rules, true) + 'r8 = r42+\n'
   const {parse} = pegjs.generate(grammar, {trace: false})
   let count = 0

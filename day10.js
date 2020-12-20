@@ -19,7 +19,7 @@ function part1(inp) {
 }
 
 function part2(inp) {
-    const len = inp.length
+  const len = inp.length
   const adjacent = mathjs.zeros(len, len)
 
   // create adacency matrix, A, which has a 1 in A[i,j] for each

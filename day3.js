@@ -42,7 +42,9 @@ function part1(trees, args) {
 }
 
 function part2(trees, args) {
-  return slopes.reduce((t, [right, down]) => t * countSlope(trees, right, down), 1)
+  return slopes.reduce(
+    (t, [right, down]) => t * countSlope(trees, right, down),
+    1)
 }
 
 function main(...args) {

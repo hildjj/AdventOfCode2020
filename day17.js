@@ -45,7 +45,9 @@ class Pos {
     if (coords[0] instanceof Pos) {
       coords = coords[0].coords
     }
-    return coords.reduce((t, c, i) => t && ((c == null) || (this.coords[i] === c)), true)
+    return coords.reduce(
+      (t, c, i) => t && ((c == null) || (this.coords[i] === c)),
+      true)
   }
   toString() {
     return this.coords.join(',')
@@ -85,7 +87,7 @@ class Cell {
     if (pos.isOrigin()) {
       return chalk.bgBlue(ch)
     }
-    if (pos.is(0,0)) {
+    if (pos.is(0, 0)) {
       return chalk.bgRed(ch)
     }
     return ch
@@ -117,7 +119,7 @@ class Sheet {
     return c
   }
   getCellVal(pos) {
-    let c = this.cells[pos]
+    const c = this.cells[pos]
     return c ? c.active : false
   }
   setCell(pos, active) {
@@ -145,8 +147,11 @@ class Sheet {
     return Utils.reduce((t, c) => c.active ? t + 1 : t, this.allCells(), 0)
   }
   scanPos() {
-    const ranges = this.min.map((min, i) => range(min-1, this.max[i] + 2)).reverse()
-    return Utils.map((coords) => new Pos(...coords.reverse()), Utils.product(ranges))
+    const ranges =
+      this.min.map((min, i) => range(min-1, this.max[i] + 2)).reverse()
+    return Utils.map(
+      (coords) => new Pos(...coords.reverse()),
+      Utils.product(ranges))
   }
   toString() {
     let str = ''
@@ -191,7 +196,7 @@ function life(sheet, times=6) {
 }
 
 function part1(inp, args) {
-  let sheet = new Sheet(3)
+  const sheet = new Sheet(3)
 
   for (const i of range(inp.length)) {
     for (const j of range(inp[i].length)) {
@@ -202,7 +207,7 @@ function part1(inp, args) {
 }
 
 function part2(inp, args) {
-  let sheet = new Sheet(4)
+  const sheet = new Sheet(4)
 
   for (const i of range(inp.length)) {
     for (const j of range(inp[i].length)) {

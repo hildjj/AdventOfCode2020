@@ -5,7 +5,7 @@ const Utils = require('./utils')
 function speakNumbers(inp, target) {
   const spoken = Array(target)  // pre-allocate, do NOT use an object
   let last = null
-  for (const [i,x] of inp.entries()) {
+  for (const [i, x] of inp.entries()) {
     if (last != null) {
       spoken[last] = i + 1
     }

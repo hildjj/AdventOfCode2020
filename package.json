@@ -6,7 +6,7 @@
   "scripts": {
     "test": "jest",
     "coverage": "jest --coverage",
-    "lint": "eslint *.js",
+    "lint": "eslint .",
     "day": "sao ./template",
     "build": "for f in *.pegjs; do pegjs -o ${f%.*}.peg.js $f; done"
   },

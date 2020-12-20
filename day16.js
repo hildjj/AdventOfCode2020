@@ -50,7 +50,7 @@ function part2(inp, args) {
 
   // remove any rule from the ruleset that doesn't allow n
   function check(n, rules) {
-    for (const ruleName of rules) {  // make copy so we can modify it in the loop
+    for (const ruleName of rules) { // make copy so we can modify it in the loop
       const [[a1, a2], [b1, b2]] = inp.rules[ruleName]
       if ( (n < a1 || n > a2) && (n < b1 || n > b2)) {
         rules.delete(ruleName)

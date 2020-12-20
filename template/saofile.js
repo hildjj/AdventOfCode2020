@@ -1,3 +1,5 @@
+'use strict'
+
 const superb = require('superb')
 const fs = require('fs')
 const {spawn} = require('child_process')
@@ -5,7 +7,9 @@ const {spawn} = require('child_process')
 const days = fs.readdirSync('.')
   .filter(f => f.match(/day\d+\.js/))
   .sort((a, b) => a.match(/\d+/)[0] - b.match(/\d+/)[0])
-const d = (days.length == 0) ? 1 : parseInt(days[days.length-1].match(/\d+/)[0]) + 1
+const d = (days.length == 0) ?
+  1 :
+  parseInt(days[days.length-1].match(/\d+/)[0]) + 1
 
 function spawnAsync(cmd, ...args) {
   return new Promise((resolve, reject) => {
@@ -23,7 +27,7 @@ function spawnAsync(cmd, ...args) {
 }
 
 module.exports = {
-actions: [
+  actions: [
     {
       type: 'add',
       files: '**'
@@ -36,7 +40,7 @@ actions: [
         'lines.pegjs': `day${d}.pegjs`,
         'input.txt': `day${d}.txt`
       }
-    },
+    }
   ],
   async completed() {
     await spawnAsync('make')

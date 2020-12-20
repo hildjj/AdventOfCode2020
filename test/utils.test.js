@@ -12,14 +12,17 @@ test('parseFile', () => {
   const t = Utils.parseFile()
   expect(t).toEqual(['1', '2'])
   const {parse} = require('./utils.test.peg')
-  const u = Utils.parseFile(path.join(__dirname, 'inputs', 'utils.test.txt'), parse)
+  const u = Utils.parseFile(
+    path.join(__dirname, 'inputs', 'utils.test.txt'),
+    parse)
   expect(u).toEqual(['1', '2'])
 
   const spy = jest.spyOn(console, 'error').mockImplementation(() => {})
   const v = Utils.parseFile(null, INVALID_FILE)
   expect(v).toEqual(['1', '2'])
   expect(spy).toHaveBeenCalled()
-  expect(spy.mock.calls).toEqual([[`No parser: "${INVALID_FILE}", falling back on readLines`]])
+  expect(spy.mock.calls)
+    .toEqual([[`No parser: "${INVALID_FILE}", falling back on readLines`]])
   spy.mockRestore()
 })
 
@@ -52,13 +55,13 @@ test('itSome', () => {
   expect(Utils.itSome(Utils.range(3), i => i % 2)).toBe(true)
   expect(Utils.itSome([1, 3, 5], i => i % 2 === 0)).toBe(false)
   const t = {}
-  expect(Utils.itSome([1, 3, 5], function (_, i) {
+  expect(Utils.itSome([1, 3, 5], function(_, i) {
     return i < 3 && this == t
   }, t)).toBe(true)
 })
 
 test('range', () => {
-  let seen = []
+  const seen = []
   for (const x of Utils.range(4)) {
     seen.push(x)
   }
@@ -73,7 +76,8 @@ test('pick', () => {
 
 test('combinations', () => {
   expect([...Utils.combinations(Utils.range(3), 5)]).toEqual([])
-  expect([...Utils.combinations([0, 1, 2], 2)]).toEqual([[0, 1], [0, 2], [1, 2]])
+  expect([...Utils.combinations([0, 1, 2], 2)])
+    .toEqual([[0, 1], [0, 2], [1, 2]])
 })
 
 test('trunc', () => {
@@ -92,7 +96,9 @@ test('take', () => {
 
 test('permutations', () => {
   expect([...Utils.permutations('ABCD', 2)].map(a => a.join('')))
-    .toEqual(['AB', 'AC', 'AD', 'BA', 'BC', 'BD', 'CA', 'CB', 'CD', 'DA', 'DB', 'DC'])
+    .toEqual([
+      'AB', 'AC', 'AD', 'BA', 'BC', 'BD', 'CA', 'CB', 'CD', 'DA', 'DB', 'DC'
+    ])
   expect([...Utils.permutations([], 1)]).toEqual([])
   expect([...Utils.permutations([1, 2, 3], 0)]).toEqual([])
   expect([...Utils.permutations([1, 2, 3], 5)]).toEqual([])
@@ -127,5 +133,6 @@ test('ncycle', () => {
 test('reduce', () => {
   expect(Utils.reduce((t, x) => t + x, Utils.range(10))).toBe(45)
   expect(Utils.reduce((t, x) => t + x, Utils.range(10), 1)).toBe(46)
-  expect(() => Utils.reduce(() => {}, [])).toThrow('Empty iterable and no initializer')
+  expect(() => Utils.reduce(() => {}, []))
+    .toThrow('Empty iterable and no initializer')
 })

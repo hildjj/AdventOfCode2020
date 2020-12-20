@@ -10,18 +10,26 @@
  */
 
 module.exports = {
+  root: true,
   "env": {
     "node": true,
-    "es6": true
+    "es6": true,
+    "jest/globals": true
   },
   "plugins": ["jest"],
   parserOptions: {
     ecmaVersion: 2020,
   },
   globals: {
-    BigInt: false
+    BigInt: false,
+    WeakRef: false
   },
   "rules": {
+    "jest/no-disabled-tests": "warn",
+    "jest/no-focused-tests": "warn",
+    "jest/no-identical-title": "error",
+    "jest/prefer-to-have-length": "warn",
+    "jest/valid-expect": "error",
     "arrow-spacing": "error",
     "brace-style": ["error", "1tbs"],
     "comma-dangle": ["error", "never"],

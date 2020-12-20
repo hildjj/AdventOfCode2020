@@ -5,7 +5,8 @@ const Utils = require('./utils')
 function part1(inp, args) {
   const reg = {}
   let mask = null
-  for (let [inst, x, y] of inp) {
+  for (const [inst, x, y0] of inp) {
+    let y = y0
     switch (inst) {
       case 'mask':
         mask = x
@@ -26,13 +27,13 @@ function part1(inp, args) {
         reg[x] = y
     }
   }
-   return Object.values(reg).reduce((t, x) => t + x, 0n).toString()
+  return Object.values(reg).reduce((t, x) => t + x, 0n).toString()
 }
 
 function part2(inp, args) {
   const reg = {}
   let mask = null
-  for (let [inst, x, y] of inp) {
+  for (const [inst, x, y] of inp) {
     switch (inst) {
       case 'mask':
         mask = x

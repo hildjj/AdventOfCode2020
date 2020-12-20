@@ -16,7 +16,8 @@ function part1(inp) {
   let x = 0
   let y = 0
 
-  for (let [dir, dist] of inp) {
+  for (const [d, dist] of inp) {
+    let dir = d
     if (dir === 'F') {
       dir = DIRKEYS[cur]
     }
@@ -93,7 +94,6 @@ function part2(inp) {
   }
   return Math.abs(x) + Math.abs(y)
 }
-
 
 function main(...args) {
   const inp = Utils.readLines().map(s => {
