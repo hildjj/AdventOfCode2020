@@ -14,3 +14,4 @@ will return an array of the lines without newlines.  This comes up so often for 
 
 
 ![Node.js CI](https://github.com/hildjj/AdventOfCode2020/workflows/Santa/badge.svg)
+[![Coverage Status](https://coveralls.io/repos/github/hildjj/AdventOfCode2020/badge.svg?branch=master)](https://coveralls.io/github/hildjj/AdventOfCode2020?branch=master)
