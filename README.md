@@ -13,5 +13,5 @@ lines = (@line "\n")*
 will return an array of the lines without newlines.  This comes up so often for me that it's worth using an odd fork to reduce the amount of code needed.
 
 
-![Node.js CI](https://github.com/hildjj/AdventOfCode2020/workflows/Santa/badge.svg)
+[![Santa CI](https://github.com/hildjj/AdventOfCode2020/workflows/Santa/badge.svg)](https://github.com/hildjj/AdventOfCode2020/actions)
 [![Coverage Status](https://coveralls.io/repos/github/hildjj/AdventOfCode2020/badge.svg?branch=master)](https://coveralls.io/github/hildjj/AdventOfCode2020?branch=master)
