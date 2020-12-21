@@ -128,12 +128,9 @@ function part2(inp) {
 }
 
 function main(...args) {
-  const inp = Utils.readLines().map(l => l.split(''))
+  const inp = Utils.readLines(args[0]).map(l => l.split(''))
   return [part1(inp, args), part2(inp, args)]
 }
 
 module.exports = main
-if (require?.main === module) {
-  const res = main(...process.argv.slice(2))
-  console.log(res)
-}
+Utils.main(require.main, module, main)

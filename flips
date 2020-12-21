@@ -1,0 +1,36 @@
+        h      v      hv
+0:
+ t      t      b      b
+l r    r l    l r    r l
+ b      b      t      t
+tl, tr, bl, br
+
+
+r1:
+ l      l      r      r
+b t    t b    b t    t b
+ r      r      l      l
+lb, lt, rb, rt
+
+r2:
+ b      b      t      t
+r l    l r    r l    l r
+ t      t      b      b
+br, bl, tr, tl
+
+
+r3:
+ r      r      l      l
+t b    b t    t b    b t
+ l      l      r      r
+rt, rb, lt, lb
+
+tl: 0, r2hv
+tr: 0h, r2v
+bl: 0v, r2h
+br: r2, 0hv
+lb: r1, r3hv
+lt: r1h, r3v
+rt: r3, r1hv
+rb: r1v, r3h
+

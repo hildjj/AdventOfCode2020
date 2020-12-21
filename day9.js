@@ -2,8 +2,8 @@
 
 const Utils = require('./utils')
 
-function main() {
-  const orig = Utils.readLines().map(s => parseInt(s, 10))
+function main(...args) {
+  const orig = Utils.readLines(args[0]).map(s => parseInt(s, 10))
   const inp = [...orig]
   const q = inp.splice(0, 25)
   let res = null
@@ -36,6 +36,4 @@ function main() {
 }
 
 module.exports = main
-if (require?.main === module) {
-  console.log(...main())
-}
+Utils.main(require.main, module, main)

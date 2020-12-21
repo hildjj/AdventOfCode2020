@@ -61,8 +61,8 @@ const rules = {
 }
 const required = Object.keys(rules)
 
-function main() {
-  const res = Utils.parseFile()
+function main(...args) {
+  const res = Utils.parseFile(args[0])
   let loose = 0
   let tight = 0
   for (const rec of res) {
@@ -78,6 +78,4 @@ function main() {
 }
 
 module.exports = main
-if (require?.main === module) {
-  console.log(main())
-}
+Utils.main(require.main, module, main)

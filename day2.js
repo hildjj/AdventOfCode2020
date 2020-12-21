@@ -2,8 +2,8 @@
 
 const Utils = require('./utils')
 
-function main() {
-  const inp = Utils.readLines()
+function main(...args) {
+  const inp = Utils.readLines(args[0])
     .map(s => s.match(/(\d+)-(\d+)\s+(\S):\s+(.*)/))
 
   const part1 = inp.filter(([_, min, max, char, pw]) => {
@@ -21,6 +21,4 @@ function main() {
 }
 
 module.exports = main
-if (require?.main === module) {
-  console.log(...main())
-}
+Utils.main(require.main, module, main)

@@ -4,8 +4,8 @@ const Utils = require('./utils')
 
 const TARGET = 'shiny gold'
 
-function main() {
-  const inp = Utils.parseFile()
+function main(...args) {
+  const inp = Utils.parseFile(args[0])
 
   const contained = {}
   const contains = {}
@@ -49,6 +49,4 @@ function main() {
 }
 
 module.exports = main
-if (require?.main === module) {
-  console.log(...main())
-}
+Utils.main(require.main, module, main)

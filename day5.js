@@ -2,8 +2,8 @@
 
 const Utils = require('./utils')
 
-function main() {
-  const inp = Utils.parseFile()
+function main(...args) {
+  const inp = Utils.parseFile(args[0])
   let max = -Infinity
   const all = [...Array(128)].map(() => [...Array(8)].map(() => -1))
   for (const [row, col] of inp) {
@@ -27,6 +27,4 @@ function main() {
 }
 
 module.exports = main
-if (require?.main === module) {
-  console.log(...main())
-}
+Utils.main(require.main, module, main)

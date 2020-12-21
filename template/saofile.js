@@ -43,7 +43,6 @@ module.exports = {
     }
   ],
   async completed() {
-    await spawnAsync('make')
     await spawnAsync('curl',
       '-b', '.cookies',
       '-o', `inputs/day${d}.txt`,

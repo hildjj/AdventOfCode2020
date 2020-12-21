@@ -46,7 +46,7 @@ function part2(inp) {
 }
 
 function main(...args) {
-  const inp = Utils.readLines().map(x => parseInt(x, 10))
+  const inp = Utils.readLines(args[0]).map(x => parseInt(x, 10))
   inp.sort((a, b) => a - b)
   const max = inp[inp.length - 1]
   inp.push(max + 3)
@@ -56,7 +56,4 @@ function main(...args) {
 }
 
 module.exports = main
-if (require?.main === module) {
-  const res = main(...process.argv.slice(2))
-  console.log(res)
-}
+Utils.main(require.main, module, main)

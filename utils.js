@@ -1,4 +1,6 @@
 'use strict'
+
+const pegjs = require('pegjs')
 const fs = require('fs')
 const path = require('path')
 
@@ -10,6 +12,42 @@ function getStack(_, stack) {
  * Utility functions
  */
 class Utils {
+  /**
+   * @callback mainCallback
+   * @param {string} [inputFile] - The input file to parse, or the default
+   * @param {boolean} trace - Do parser tracing?
+   * @param {Object} params - The command line, as `{args, params, flags}`
+   * @returns {boolean} - Does this item match?
+   */
+
+  /**
+   * Wrapper for main, so that it only gets called if the module hasn't been
+   * required (e.g. when jest tests are being run).  Prints the return from
+   * mainFunc.
+   *
+   * @static
+   * @param {NodeJS.Module} rmain - The main module currently executing.
+   *   Pass in `require.main`
+   * @param {NodeJS.Module} mod - The module in the file that is calling in.
+   *   Pass in `module`
+   * @param {mainCallback} mainFunc - The function to call if rmain == mod
+   * @example
+   * Utils.main(require.main, module, main)
+   */
+  static main(rmain, mod, mainFunc) {
+    if (rmain === mod) {
+      const args = process.argv.slice(2)
+      const [params, flags] = args.reduce((t, v) => {
+        t[v.startsWith('--') ? 1 : 0].push(v)
+        return t
+      }, [[], []])
+      const inputFile = params[0]
+      const trace = flags.indexOf('--trace') >= 0
+      const res = mainFunc(inputFile, trace, { args, params, flags })
+      console.log(res)
+    }
+  }
+
   /**
    * Read file, parse lines.
    *
@@ -36,9 +74,10 @@ class Utils {
    *   file to require.  If a function, the pre-required parser.  If null,
    *   find the parser with the matching name. If no parser found, split
    *   like `readLines`.
+   * @param {boolean} [trace=false] - turn on parser tracing?
    * @returns {any} - the output of the parser
    */
-  static parseFile(filename, parser) {
+  static parseFile(filename, parser, trace=false) {
     if (!filename) {
       filename = this._adjacentFile('.txt', 'inputs')
     }
@@ -49,18 +88,10 @@ class Utils {
     if (typeof parser === 'function') {
       parserFunc = parser
     } else {
-      if (!parser) {
-        parser = this._adjacentFile('.peg.js')
-      }
-
-      try {
-        parserFunc = require(parser).parse
-      } catch {
-        console.error(`No parser: "${parser}", falling back on readLines`)
-        return txt
-          .split('\n')
-          .filter(s => s.length)
-      }
+      const parserFile = parser ?? this._adjacentFile('.pegjs')
+      const parserText = fs.readFileSync(parserFile, 'utf8')
+      // @ts-ignore: TS2339, PegJS team can't get out of their own way.
+      parserFunc = pegjs.generate(parserText, {trace}).parse
     }
     return parserFunc(txt)
   }

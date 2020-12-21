@@ -2,8 +2,8 @@
 
 const Utils = require('./utils')
 
-function main() {
-  const inp = Utils.parseFile()
+function main(...args) {
+  const inp = Utils.parseFile(args[0])
   let tot = 0
   let atot = 0
   for (const group of inp) {
@@ -21,6 +21,4 @@ function main() {
 }
 
 module.exports = main
-if (require?.main === module) {
-  console.log(...main())
-}
+Utils.main(require.main, module, main)

@@ -12,12 +12,12 @@ function evalMath(e) {
 }
 
 function part1(args) {
-  const inp = Utils.parseFile()
+  const inp = Utils.parseFile(args[0])
   return inp.reduce((t, e) => t + evalMath(e), 0)
 }
 
 function part2(args) {
-  const inp = Utils.parseFile(null, './day18p2.peg')
+  const inp = Utils.parseFile(args[0], './day18p2.pegjs')
   return inp.reduce((t, e) => t + evalMath(e), 0)
 }
 
@@ -26,7 +26,4 @@ function main(...args) {
 }
 
 module.exports = main
-if (require.main === module) {
-  const res = main(...process.argv.slice(2))
-  console.log(res)
-}
+Utils.main(require.main, module, main)

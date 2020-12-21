@@ -19,7 +19,7 @@ function part2(inp) {
 }
 
 function main(...args) {
-  const inp = Utils.readLines()
+  const inp = Utils.readLines(args[0])
     .map(x => parseInt(x, 10))
     .sort()
 
@@ -27,7 +27,4 @@ function main(...args) {
 }
 
 module.exports = main
-if (require?.main === module) {
-  const res = main(...process.argv.slice(2))
-  console.log(res)
-}
+Utils.main(require.main, module, main)

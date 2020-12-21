@@ -3,6 +3,37 @@ const Utils = require('../utils')
 const path = require('path')
 
 const INVALID_FILE = `_____DOES___NOT___EXIST:${process.pid}`
+
+test('main', () => {
+  // eslint-disable-next-line no-undef
+  Utils.main(1, 2, () => fail('Never here'))
+  const oldArgv = process.argv
+  process.argv = ['node', 'foo']
+  const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
+
+  Utils.main(1, 1, (inputFile, trace, opts) => {
+    expect(inputFile).toBeUndefined()
+    expect(trace).toBeFalsy()
+    expect(opts).toEqual({
+      params: [],
+      flags: [],
+      args: []
+    })
+  })
+  process.argv = ['node', 'foo', 'input', '--trace', 'other', '--myFlag']
+  Utils.main(1, 1, (inputFile, trace, opts) => {
+    expect(inputFile).toBe('input')
+    expect(trace).toBeTruthy()
+    expect(opts).toEqual({
+      params: ['input', 'other'],
+      flags: ['--trace', '--myFlag'],
+      args: ['input', '--trace', 'other', '--myFlag']
+    })
+  })
+  expect(logSpy).toHaveBeenCalledTimes(2)
+  logSpy.mockRestore()
+  process.argv = oldArgv
+})
 test('readLines', () => {
   const t = Utils.readLines()
   expect(t).toEqual(['1', '2'])
@@ -11,19 +42,15 @@ test('readLines', () => {
 test('parseFile', () => {
   const t = Utils.parseFile()
   expect(t).toEqual(['1', '2'])
-  const {parse} = require('./utils.test.peg')
+  const parse = () => {
+    return ['1', '2']
+  }
   const u = Utils.parseFile(
     path.join(__dirname, 'inputs', 'utils.test.txt'),
     parse)
   expect(u).toEqual(['1', '2'])
 
-  const spy = jest.spyOn(console, 'error').mockImplementation(() => {})
-  const v = Utils.parseFile(null, INVALID_FILE)
-  expect(v).toEqual(['1', '2'])
-  expect(spy).toHaveBeenCalled()
-  expect(spy.mock.calls)
-    .toEqual([[`No parser: "${INVALID_FILE}", falling back on readLines`]])
-  spy.mockRestore()
+  expect(() => Utils.parseFile(null, INVALID_FILE)).toThrow()
 })
 
 test('mod', () => {

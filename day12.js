@@ -96,7 +96,7 @@ function part2(inp) {
 }
 
 function main(...args) {
-  const inp = Utils.readLines().map(s => {
+  const inp = Utils.readLines(args[0]).map(s => {
     const m = s.match(/([NSEWLRF])(\d+)/)
     if (!m) {
       throw new Error(s)
@@ -107,7 +107,4 @@ function main(...args) {
 }
 
 module.exports = main
-if (require?.main === module) {
-  const res = main(...process.argv.slice(2))
-  console.log(res)
-}
+Utils.main(require.main, module, main)

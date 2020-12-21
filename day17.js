@@ -218,13 +218,10 @@ function part2(inp, args) {
 }
 
 function main(...args) {
-  const inp = Utils.readLines().map(a => a.split('').map(c => c === '#'))
+  const inp = Utils.readLines(args[0]).map(a => a.split('').map(c => c === '#'))
 
   return [part1(inp, args), part2(inp, args)]
 }
 
 module.exports = main
-if (require.main === module) {
-  const res = main(...process.argv.slice(2))
-  console.log(res)
-}
+Utils.main(require.main, module, main)
