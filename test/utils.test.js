@@ -143,6 +143,11 @@ test('forEver', () => {
   ])
 })
 
+test('filter', () => {
+  expect([...Utils.filter(Utils.take(Utils.range(0, 10000), 10), t => t % 2)])
+    .toEqual([1, 3, 5, 7, 9])
+})
+
 test('product', () => {
   expect([...Utils.product(['AB'], 2)].map(a => a.join('')))
     .toEqual(['AA', 'AB', 'BA', 'BB'])

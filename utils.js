@@ -251,6 +251,34 @@ class Utils {
     }
   }
 
+  /**
+   * @callback filterCallback
+   * @param {any} item - The item of the iterator to filter
+   * @param {number} index - The index of the item in the iterator
+   * @param {Iterable} iterable - The iterable being filtered
+   * @returns {boolean} - if true, this item is retained
+   */
+
+  /**
+   * Filter the iterable by a function.  If the function returns true,
+   * the given value is yielded.  This should be a pretty big win over
+   * `[...iterable].filter(fn)`.
+   *
+   * @static
+   * @param {Iterable} iterable - the iterable to filter
+   * @param {filterCallback} fn - function called for every item in iterable
+   * @param {any} [thisArg] - `this` in the filterCallback
+   * @yields {any} - iterable values that match
+   */
+  static *filter(iterable, fn, thisArg) {
+    let count = 0
+    for (const val of iterable) {
+      if (fn.call(thisArg, val, count++, iterable)) {
+        yield val
+      }
+    }
+  }
+
   // BELOW lifted from https://github.com/aureooms/js-itertools,
   // removed need for weird runtime
   // ----------

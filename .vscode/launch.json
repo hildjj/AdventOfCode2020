@@ -51,6 +51,24 @@
         "<node_internals>/**"
       ],
       "program": "${file}"
+    },
+    {
+      "type": "pwa-node",
+      "request": "launch",
+      "name": "Current File, args",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "program": "${file}",
+      "args": ["t.txt"]
+    }
+  ],
+  "inputs": [
+    {
+      "id": "args",
+      "type": "promptString",
+      "description": "Arguments",
+      "default": ""
     }
   ]
 }
