@@ -14,6 +14,9 @@ function transform(val, loopSize) {
   return cur
 }
 
+// This is naive discrete log approach.  If it needs to be faster, there
+// are some links to algorithms here:
+// https://en.wikipedia.org/wiki/Discrete_logarithm
 function findKey(target, subject) {
   let val = 1
   let i = 1
